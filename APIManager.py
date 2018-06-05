@@ -1,6 +1,5 @@
 import requests
 import json
-import urllib.parse
 
 class APIManager:
 
@@ -10,6 +9,9 @@ class APIManager:
 
 	# functions to be used in url
 	FUNCTIONS = ('TIME_SERIES_INTRADAY', 'TIME_SERIES_DAILY', 'TIME_SERIES_DAILY_ADJUSTED', 'TIME_SERIES_WEEKLY','TIME_SERIES_WEEKLY_ADJUSTED', 'TIME_SERIES_MONTHLY', 'TIME_SERIES_MONTHLY_ADJUSTED', 'BATCH_STOCK_QUOTES')
+
+	# api response has different keys corresponding to different api calls
+	RESPONSE_KEYS = ("Time Series", "Time Series (Daily)", "Weekly Time Series", "Weekly Adjusted Time Series", "Monthly Time Series", "Monthly Adjusted Time Series", "Stock Quotes" )
 
 	# private function to build url
 	def __build_url(self, function, symbol, interval, output_size):
@@ -33,12 +35,14 @@ class APIManager:
 	# call gets an integer as a function param and integer or None as interval param
 	def get_stock_info(self, symbol, function, interval):
 		self.API_FUNCTION = 'function=' + self.FUNCTIONS[function - 1] # 0 is the first intradaily request function
-		self.API_SYMBOL = 'symbol=' + symbol
-		self.API_INTERVAL = None if interval is None else 'interval=' + str(interval) + 'min'
+		self.API_SYMBOL = 'symbols=' + symbol if function == 8 else 'symbol=' + symbol # for batch quotes symbols= is needed
+		self.API_INTERVAL = None if interval is None else 'interval=' + str(interval) + 'min' # None should be passed if interval isnt needed
 
-		# get input if the user would like to see the full or shortned list
-		compact = input("Type 'c' for a compact list of only 100 inputs, or press any other key to see the full list: ") 
-		self.API_OUTPUT_SIZE = 'outputsize=compact' if compact is 'c' else 'outputsize=full'
+		# get input if the user would like to see the full or shortned list (only works for intradaily and daily)
+		list_size = 'f' # start with full list
+		if function <= 3:
+			list_size = input("Type 'c' for a compact list of only 100 inputs, or press any other key to see the full list: ") 
+		self.API_OUTPUT_SIZE = 'outputsize=compact' if list_size is 'c' else 'outputsize=full'
 
 		# build and return url
 		url = self.__build_url(self.API_FUNCTION, self.API_SYMBOL, self.API_INTERVAL, self.API_OUTPUT_SIZE)
