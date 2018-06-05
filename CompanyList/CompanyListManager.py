@@ -25,6 +25,5 @@ class CompanyListManager:
 			names.append(name)
 			ipo_year.append(new_ipo)
 
-		# build pandas dataframe to be passed
 		return pandas.DataFrame({'Symbol': symbols, 'Name': names, 'IPO Year': ipo_year})	
 

@@ -22,6 +22,7 @@ class APIManager:
 
 	# fetch the url and check for erros
 	def __fetch(self, url):
+		# get response
 		response = requests.get(url)
 
 		if response.status_code == 200: # SUCCESS
